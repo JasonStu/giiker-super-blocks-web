@@ -55,18 +55,24 @@ export const App: React.FC = () => {
 
   const handleNextLevel = () => {
     soundEngine.playClick();
-    if (levelIndex < BUILTIN_LEVELS.length - 1) {
-      setLevelIndex(levelIndex + 1);
-      resetLevel();
-    }
+    setLevelIndex((prev) => {
+      if (prev < BUILTIN_LEVELS.length - 1) {
+        resetLevel();
+        return prev + 1;
+      }
+      return prev;
+    });
   };
 
   const handlePrevLevel = () => {
     soundEngine.playClick();
-    if (levelIndex > 0) {
-      setLevelIndex(levelIndex - 1);
-      resetLevel();
-    }
+    setLevelIndex((prev) => {
+      if (prev > 0) {
+        resetLevel();
+        return prev - 1;
+      }
+      return prev;
+    });
   };
 
   // 提示模式 (Learn/Hint)
@@ -199,8 +205,8 @@ export const App: React.FC = () => {
         const maxY = Math.max(...dragState.cells.map(([, y]) => y));
 
         // 几何中心对齐换算为左上角 (0, 0) 网格索引
-        const gridX = Math.round((currX - gridRect.left) / cellSize - maxX / 2);
-        const gridY = Math.round((touchAdjustedY - gridRect.top) / cellSize - maxY / 2);
+        const gridX = Math.round((currX - gridRect.left) / cellSize - (maxX + 1) / 2);
+        const gridY = Math.round((touchAdjustedY - gridRect.top) / cellSize - (maxY + 1) / 2);
 
         const absoluteCells: Coord[] = dragState.cells.map(([cx, cy]) => [cx + gridX, cy + gridY]);
         const blockDef = BLOCKS_16[dragState.blockId];
@@ -247,8 +253,8 @@ export const App: React.FC = () => {
         const maxY = Math.max(...cells.map(([, y]) => y));
 
         // 精准几何中心对齐
-        const gridX = Math.round((currX - gridRect.left) / cellSize - maxX / 2);
-        const gridY = Math.round((touchAdjustedY - gridRect.top) / cellSize - maxY / 2);
+        const gridX = Math.round((currX - gridRect.left) / cellSize - (maxX + 1) / 2);
+        const gridY = Math.round((touchAdjustedY - gridRect.top) / cellSize - (maxY + 1) / 2);
 
         const absoluteCells: Coord[] = cells.map(([cx, cy]) => [cx + gridX, cy + gridY]);
         const blockDef = BLOCKS_16[blockId];

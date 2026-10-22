@@ -67,11 +67,12 @@ export const LedBoard = forwardRef<HTMLDivElement, LedBoardProps>(({
         cellStyle = ghostValid
           ? "bg-emerald-400/50 border-2 border-emerald-300 shadow-[0_0_10px_rgba(52,211,153,0.8)]"
           : "bg-rose-500/50 border-2 border-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.8)]";
+      } else if (isHint) {
+        // 提示优先于普通目标格显示
+        cellStyle = "bg-amber-400/60 border-2 border-dashed border-amber-300 animate-pulse shadow-[0_0_12px_rgba(251,191,36,0.8)]";
       } else if (isTarget) {
         // 题目点亮目标格 (计客经典的冰蓝冷光)
         cellStyle = "bg-[#38bdf8] border-[#bae6fd] shadow-[0_0_12px_rgba(56,189,248,0.85)]";
-      } else if (isHint) {
-        cellStyle = "bg-amber-400/60 border-2 border-dashed border-amber-300 animate-pulse shadow-[0_0_12px_rgba(251,191,36,0.8)]";
       }
 
       if (isVictorious) {
