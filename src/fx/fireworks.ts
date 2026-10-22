@@ -1,4 +1,4 @@
-import { Difficulty } from '../engine/levels';
+import { Difficulty } from '../engine/types';
 
 interface Particle {
   x: number;
@@ -35,26 +35,44 @@ export class FireworksEngine {
     const w = this.canvas.width;
     const h = this.canvas.height;
 
-    const colors = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#ec4899', '#8b5cf6'];
+    const cyanPalette = ['#06b6d4', '#38bdf8', '#bae6fd', '#ffffff'];
+    const greenPalette = ['#10b981', '#34d399', '#a7f3d0', '#facc15'];
+    const amberPalette = ['#f59e0b', '#fbbf24', '#fef08a', '#fb923c'];
+    const purplePalette = ['#a855f7', '#c084fc', '#e9d5ff', '#ec4899', '#38bdf8'];
+    const crimsonPalette = ['#ef4444', '#f87171', '#fca5a5', '#fbbf24', '#ffffff'];
 
-    if (difficulty === 'beginner') {
-      // 简单纸屑彩带喷射：从屏幕中上方喷发
-      this.createBurst(w / 2, h * 0.45, 60, colors, 5);
-    } else if (difficulty === 'intermediate') {
-      // 双重牡丹花环烟花
-      this.createBurst(w * 0.35, h * 0.4, 90, colors, 7);
-      setTimeout(() => this.createBurst(w * 0.65, h * 0.35, 90, colors, 7), 200);
-    } else {
-      // 大师级：多点连发重磅流星瀑布
+    if (difficulty === 'novice') {
+      this.createBurst(w / 2, h * 0.45, 60, cyanPalette, 5);
+    } else if (difficulty === 'apprentice') {
+      this.createBurst(w * 0.38, h * 0.42, 80, greenPalette, 6);
+      setTimeout(() => this.createBurst(w * 0.62, h * 0.38, 80, greenPalette, 6), 180);
+    } else if (difficulty === 'adept') {
+      this.createBurst(w * 0.3, h * 0.45, 90, amberPalette, 7);
+      setTimeout(() => this.createBurst(w * 0.5, h * 0.32, 100, amberPalette, 8), 150);
+      setTimeout(() => this.createBurst(w * 0.7, h * 0.45, 90, amberPalette, 7), 300);
+    } else if (difficulty === 'master') {
       const spots = [
         [w * 0.25, h * 0.4],
-        [w * 0.5, h * 0.3],
+        [w * 0.5, h * 0.28],
         [w * 0.75, h * 0.4],
-        [w * 0.4, h * 0.5],
-        [w * 0.6, h * 0.5],
+        [w * 0.4, h * 0.48],
+        [w * 0.6, h * 0.48],
       ];
       spots.forEach(([x, y], idx) => {
-        setTimeout(() => this.createBurst(x, y, 100, colors, 9), idx * 180);
+        setTimeout(() => this.createBurst(x, y, 90, purplePalette, 8), idx * 150);
+      });
+    } else {
+      // grandmaster
+      const spots = [
+        [w * 0.2, h * 0.35],
+        [w * 0.5, h * 0.25],
+        [w * 0.8, h * 0.35],
+        [w * 0.35, h * 0.45],
+        [w * 0.65, h * 0.45],
+        [w * 0.5, h * 0.55],
+      ];
+      spots.forEach(([x, y], idx) => {
+        setTimeout(() => this.createBurst(x, y, 110, crimsonPalette, 10), idx * 130);
       });
     }
 

@@ -15,28 +15,23 @@ export function rotateClockwise(cells: Coord[]): Coord[] {
   return normalizeCells(rotated);
 }
 
-export const BLOCKS_16: Record<BlockId, BlockDefinition> = {
-  // 红色组：基础几何
+export const BLOCKS_8: Record<BlockId, BlockDefinition> = {
+  // 红色组（2块）
   r1: { id: 'r1', color: 'red', name: '单格点', cells: [[0, 0]] },
-  r2: { id: 'r2', color: 'red', name: '双格棒', cells: [[0, 0], [1, 0]] },
-  r3: { id: 'r3', color: 'red', name: '小三折', cells: [[0, 0], [1, 0], [0, 1]] },
-  r4: { id: 'r4', color: 'red', name: '四格田', cells: [[0, 0], [1, 0], [0, 1], [1, 1]] },
+  r2: { id: 'r2', color: 'red', name: '四格田', cells: [[0, 0], [1, 0], [0, 1], [1, 1]] },
 
-  // 黄色组：四格骨牌
-  y1: { id: 'y1', color: 'yellow', name: '三格棒', cells: [[0, 0], [1, 0], [2, 0]] },
+  // 黄色组（2块）
+  y1: { id: 'y1', color: 'yellow', name: '双格棒', cells: [[0, 0], [1, 0]] },
   y2: { id: 'y2', color: 'yellow', name: '四格T', cells: [[0, 0], [1, 0], [2, 0], [1, 1]] },
-  y3: { id: 'y3', color: 'yellow', name: '四格L', cells: [[0, 0], [0, 1], [0, 2], [1, 2]] },
-  y4: { id: 'y4', color: 'yellow', name: '四格Z', cells: [[0, 0], [1, 0], [1, 1], [2, 1]] },
 
-  // 蓝色组：扩展四格与五格
-  b1: { id: 'b1', color: 'blue', name: '四格长棒', cells: [[0, 0], [1, 0], [2, 0], [3, 0]] },
-  b2: { id: 'b2', color: 'blue', name: '四格拐角', cells: [[0, 0], [1, 0], [1, 1], [1, 2]] },
-  b3: { id: 'b3', color: 'blue', name: '五格P', cells: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2]] },
-  b4: { id: 'b4', color: 'blue', name: '五格W', cells: [[0, 0], [0, 1], [1, 1], [1, 2], [2, 2]] },
+  // 蓝色组（2块）
+  b1: { id: 'b1', color: 'blue', name: '三格折角', cells: [[0, 0], [1, 0], [0, 1]] },
+  b2: { id: 'b2', color: 'blue', name: '四格L', cells: [[0, 0], [0, 1], [0, 2], [1, 2]] },
 
-  // 绿色组：复杂五格
-  g1: { id: 'g1', color: 'green', name: '五格十字', cells: [[1, 0], [0, 1], [1, 1], [2, 1], [1, 2]] },
-  g2: { id: 'g2', color: 'green', name: '五格U', cells: [[0, 0], [2, 0], [0, 1], [1, 1], [2, 1]] },
-  g3: { id: 'g3', color: 'green', name: '五格长L', cells: [[0, 0], [0, 1], [0, 2], [0, 3], [1, 3]] },
-  g4: { id: 'g4', color: 'green', name: '五格V', cells: [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]] },
+  // 绿色组（2块）
+  g1: { id: 'g1', color: 'green', name: '三格长棒', cells: [[0, 0], [1, 0], [2, 0]] },
+  g2: { id: 'g2', color: 'green', name: '四格Z', cells: [[0, 0], [1, 0], [1, 1], [2, 1]] },
 };
+
+// 保持对旧引用别名兼容
+export const BLOCKS_16 = BLOCKS_8;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BlockId, BlockColor, Coord } from '../engine/types';
-import { BLOCKS_16, rotateClockwise } from '../engine/polyominoes';
+import { BLOCKS_8, rotateClockwise } from '../engine/polyominoes';
 import { BlockPiece } from './BlockPiece';
 
 interface BlockTrayProps {
@@ -16,7 +16,7 @@ export const BlockTray: React.FC<BlockTrayProps> = ({
 }) => {
   const [rotations, setRotations] = useState<Record<BlockId, Coord[]>>(() => {
     const init: Record<string, Coord[]> = {};
-    for (const [id, block] of Object.entries(BLOCKS_16)) {
+    for (const [id, block] of Object.entries(BLOCKS_8)) {
       init[id] = block.cells;
     }
     return init as Record<BlockId, Coord[]>;
@@ -29,17 +29,22 @@ export const BlockTray: React.FC<BlockTrayProps> = ({
     }));
   };
 
-  const blocks = Object.values(BLOCKS_16);
+  const blocks = Object.values(BLOCKS_8);
 
   return (
-    <div className="w-full max-w-md lg:max-w-xs p-4 bg-[#14171d] border-2 border-[#262b35] rounded-3xl shadow-xl flex flex-col gap-4">
-      <div className="flex items-center justify-between border-b border-slate-700 pb-2">
-        <span className="text-xs font-bold text-slate-400 tracking-wider">BLOCK TRAY (16 PIECES)</span>
-        <span className="text-xs text-sky-400">点击旋转 / 拖拽上盘</span>
+    <div className="w-full max-w-md lg:max-w-sm p-4 bg-[#14171d]/95 border-2 border-[#262b35] rounded-3xl shadow-xl flex flex-col gap-3">
+      <div className="flex items-center justify-between border-b border-slate-700/60 pb-2">
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs font-bold text-slate-300 tracking-wider">BLOCK TRAY</span>
+          <span className="px-1.5 py-0.2 rounded bg-sky-950 border border-sky-800 text-[10px] text-sky-400 font-mono">
+            8 PIECES
+          </span>
+        </div>
+        <span className="text-[11px] text-slate-400">点击旋转 / 拖拽上盘</span>
       </div>
 
-      {/* 四色分组容器 */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3 max-h-[460px] overflow-y-auto p-1">
+      {/* 8 块积木自适应网格，iPad / 桌面上一屏尽览无需滚动 */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2.5 p-1">
         {blocks.map((block) => {
           const isAllowed = allowedColors.includes(block.color);
           const isPlaced = placedBlockIds.has(block.id);
@@ -48,7 +53,11 @@ export const BlockTray: React.FC<BlockTrayProps> = ({
           return (
             <div
               key={block.id}
-              className="flex items-center justify-center p-2 bg-[#1b1f27] border border-[#2d3442] rounded-2xl"
+              className={`flex flex-col items-center justify-center p-2 rounded-2xl border transition-all ${
+                isAllowed
+                  ? 'bg-[#1b1f28] border-[#2c3342] shadow-sm'
+                  : 'bg-[#15171d] border-[#20242e] opacity-35'
+              }`}
             >
               <BlockPiece
                 block={block}
@@ -60,6 +69,9 @@ export const BlockTray: React.FC<BlockTrayProps> = ({
                   onStartDrag(block.id, cells, e.clientX, e.clientY);
                 }}
               />
+              <span className="text-[10px] text-slate-400 mt-1 font-sans">
+                {block.name}
+              </span>
             </div>
           );
         })}

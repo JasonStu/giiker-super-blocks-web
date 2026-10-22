@@ -1,4 +1,4 @@
-import { Difficulty } from '../engine/levels';
+import { Difficulty } from '../engine/types';
 
 class SoundEngine {
   private ctx: AudioContext | null = null;
@@ -65,7 +65,6 @@ class SoundEngine {
   public playError() {
     const ctx = this.getContext();
     if (!ctx) return;
-    // 双蜂鸣音
     [0, 0.12].forEach((offset) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -84,15 +83,22 @@ class SoundEngine {
     const ctx = this.getContext();
     if (!ctx) return;
 
-    let notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 (Beginner)
-    let stepTime = 0.09;
+    let notes: number[] = [];
+    let stepTime = 0.08;
 
-    if (difficulty === 'intermediate') {
-      notes = [523.25, 659.25, 783.99, 880.00, 1046.50, 1318.51];
-      stepTime = 0.08;
+    if (difficulty === 'novice') {
+      notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+    } else if (difficulty === 'apprentice') {
+      notes = [523.25, 659.25, 783.99, 880.00, 1046.50];
+    } else if (difficulty === 'adept') {
+      notes = [440.00, 554.37, 659.25, 880.00, 1108.73, 1318.51];
     } else if (difficulty === 'master') {
-      notes = [392.00, 523.25, 659.25, 783.99, 1046.50, 1174.66, 1318.51, 1567.98];
+      notes = [523.25, 659.25, 783.99, 880.00, 1046.50, 1174.66, 1318.51];
       stepTime = 0.07;
+    } else {
+      // grandmaster
+      notes = [392.00, 523.25, 659.25, 783.99, 1046.50, 1174.66, 1318.51, 1567.98];
+      stepTime = 0.06;
     }
 
     notes.forEach((freq, idx) => {

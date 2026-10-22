@@ -1,10 +1,12 @@
 export type BlockColor = 'red' | 'yellow' | 'blue' | 'green';
 
 export type BlockId =
-  | 'r1' | 'r2' | 'r3' | 'r4'
-  | 'y1' | 'y2' | 'y3' | 'y4'
-  | 'b1' | 'b2' | 'b3' | 'b4'
-  | 'g1' | 'g2' | 'g3' | 'g4';
+  | 'r1' | 'r2'
+  | 'y1' | 'y2'
+  | 'b1' | 'b2'
+  | 'g1' | 'g2';
+
+export type Difficulty = 'novice' | 'apprentice' | 'adept' | 'master' | 'grandmaster';
 
 export type Coord = [number, number]; // [x, y] where 0 <= x, y < 8
 

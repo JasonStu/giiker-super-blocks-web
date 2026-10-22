@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BUILTIN_LEVELS } from './engine/levels';
-import { BlockId, Coord, PlacedBlock } from './engine/types';
-import { BLOCKS_16, rotateClockwise } from './engine/polyominoes';
+import { BlockId, Coord, PlacedBlock, Difficulty } from './engine/types';
+import { BLOCKS_8, rotateClockwise } from './engine/polyominoes';
 import { coordsToBitmask, validatePlacement, checkVictory } from './engine/bitboard';
 import { findSolution } from './engine/solver';
 import { soundEngine } from './audio/soundEngine';
@@ -75,6 +75,21 @@ export const App: React.FC = () => {
     });
   };
 
+  const handleSelectDifficulty = (difficulty: Difficulty) => {
+    soundEngine.playClick();
+    const targetStartLevelMap: Record<Difficulty, number> = {
+      novice: 0,        // Level 1
+      apprentice: 20,   // Level 21
+      adept: 40,        // Level 41
+      master: 60,       // Level 61
+      grandmaster: 80,  // Level 81
+    };
+    const targetIdx = targetStartLevelMap[difficulty];
+    setLevelIndex(targetIdx);
+    resetLevel();
+    showToast(`已切换至【${currentLevel.name.split(' ')[0]}】第 ${targetIdx + 1} 关`);
+  };
+
   // 提示模式 (Learn/Hint)
   const handleHint = () => {
     soundEngine.playClick();
@@ -84,12 +99,11 @@ export const App: React.FC = () => {
       return;
     }
 
-    // 找到尚未放置的第一块解法积木并高亮其格子
     const placedSet = new Set(placedBlocks.map((b) => b.id));
     const nextPiece = solution.find((b) => !placedSet.has(b.id));
     if (nextPiece) {
       setHintCells(nextPiece.cells);
-      showToast(`提示：请尝试摆放【${BLOCKS_16[nextPiece.id].name}】`);
+      showToast(`提示：请尝试摆放【${BLOCKS_8[nextPiece.id].name}】`);
       setTimeout(() => setHintCells([]), 4000);
     } else {
       showToast("所有必要积木已全部放置！");
@@ -107,7 +121,7 @@ export const App: React.FC = () => {
     soundEngine.playClick();
     const removed = placedBlocks[clickedBlockIndex];
     setPlacedBlocks((prev) => prev.filter((_, idx) => idx !== clickedBlockIndex));
-    showToast(`已取下 ${BLOCKS_16[removed.id].name}`);
+    showToast(`已取下 ${BLOCKS_8[removed.id].name}`);
   };
 
   // 处理盘面积木单击：尝试顺时针旋转，无法旋转时报错保留，严禁擅自删除
@@ -193,7 +207,6 @@ export const App: React.FC = () => {
       const isTouch = pointerType === 'touch';
       const touchAdjustedY = isTouch ? currY - 24 : currY;
 
-      // 判断光标是否在网格范围内或接近网格
       if (
         currX >= gridRect.left - 20 &&
         currX <= gridRect.right + 20 &&
@@ -204,12 +217,12 @@ export const App: React.FC = () => {
         const maxX = Math.max(...dragState.cells.map(([x]) => x));
         const maxY = Math.max(...dragState.cells.map(([, y]) => y));
 
-        // 几何中心对齐换算为左上角 (0, 0) 网格索引
+        // 几何中心准确对齐换算为左上角 (0, 0)
         const gridX = Math.round((currX - gridRect.left) / cellSize - (maxX + 1) / 2);
         const gridY = Math.round((touchAdjustedY - gridRect.top) / cellSize - (maxY + 1) / 2);
 
         const absoluteCells: Coord[] = dragState.cells.map(([cx, cy]) => [cx + gridX, cy + gridY]);
-        const blockDef = BLOCKS_16[dragState.blockId];
+        const blockDef = BLOCKS_8[dragState.blockId];
 
         let currentBoardMask = 0n;
         for (const b of placedBlocks) currentBoardMask |= coordsToBitmask(b.cells);
@@ -241,7 +254,6 @@ export const App: React.FC = () => {
       const isTouch = pointerType === 'touch';
       const touchAdjustedY = isTouch ? currY - 24 : currY;
 
-      // 判定是否释放在有效 8x8 棋盘内
       if (
         currX >= gridRect.left - 10 &&
         currX <= gridRect.right + 10 &&
@@ -252,12 +264,11 @@ export const App: React.FC = () => {
         const maxX = Math.max(...cells.map(([x]) => x));
         const maxY = Math.max(...cells.map(([, y]) => y));
 
-        // 精准几何中心对齐
         const gridX = Math.round((currX - gridRect.left) / cellSize - (maxX + 1) / 2);
         const gridY = Math.round((touchAdjustedY - gridRect.top) / cellSize - (maxY + 1) / 2);
 
         const absoluteCells: Coord[] = cells.map(([cx, cy]) => [cx + gridX, cy + gridY]);
-        const blockDef = BLOCKS_16[blockId];
+        const blockDef = BLOCKS_8[blockId];
 
         let currentBoardMask = 0n;
         for (const b of placedBlocks) currentBoardMask |= coordsToBitmask(b.cells);
@@ -311,7 +322,7 @@ export const App: React.FC = () => {
   const placedBlockIds = new Set(placedBlocks.map((b) => b.id));
 
   return (
-    <div className="relative min-h-screen w-full bg-[#0d0f14] text-slate-100 flex flex-col items-center justify-center p-3 sm:p-6 overflow-hidden select-none touch-none">
+    <div className="relative min-h-screen w-full bg-[#0b0d11] text-slate-100 flex flex-col items-center justify-center p-3 sm:p-6 overflow-hidden select-none touch-none">
       <FireworksOverlay />
 
       {/* 状态与操作提示气泡 */}
@@ -330,6 +341,7 @@ export const App: React.FC = () => {
           onNext={handleNextLevel}
           onReset={resetLevel}
           onHint={handleHint}
+          onSelectDifficulty={handleSelectDifficulty}
           isMuted={isMuted}
           onToggleSound={() => {
             const nextMuted = !isMuted;
@@ -353,7 +365,7 @@ export const App: React.FC = () => {
 
             {/* 通关快捷下一关按钮 */}
             {isWon && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm rounded-2xl animate-fade-in z-20 gap-3">
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/65 backdrop-blur-sm rounded-2xl animate-fade-in z-20 gap-3">
                 <span className="text-xl font-extrabold text-amber-300 drop-shadow-md">
                   CHALLENGE CLEARED!
                 </span>
@@ -402,7 +414,7 @@ export const App: React.FC = () => {
             {Array.from({ length: Math.max(...dragState.cells.map(([, y]) => y)) + 1 }).map((_, y) =>
               Array.from({ length: Math.max(...dragState.cells.map(([x]) => x)) + 1 }).map((_, x) => {
                 const hasCell = dragState.cells.some(([cx, cy]) => cx === x && cy === y);
-                const color = BLOCKS_16[dragState.blockId].color;
+                const color = BLOCKS_8[dragState.blockId].color;
                 const colorMap = {
                   red: 'bg-red-500 border-red-300 shadow-[0_0_8px_rgba(239,68,68,0.7)]',
                   yellow: 'bg-yellow-400 border-yellow-200 shadow-[0_0_8px_rgba(234,179,8,0.7)]',
