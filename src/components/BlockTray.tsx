@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
 import { BlockId, BlockColor, Coord } from '../engine/types';
 import { BLOCKS_8, rotateClockwise } from '../engine/polyominoes';
+import { Language, translations } from '../i18n/locales';
 import { BlockPiece } from './BlockPiece';
 
 interface BlockTrayProps {
   allowedColors: BlockColor[];
   placedBlockIds: Set<BlockId>;
+  lang: Language;
   onStartDrag: (blockId: BlockId, cells: Coord[], clientX: number, clientY: number) => void;
 }
 
 export const BlockTray: React.FC<BlockTrayProps> = ({
   allowedColors,
   placedBlockIds,
+  lang,
   onStartDrag,
 }) => {
+  const t = translations[lang];
   const [rotations, setRotations] = useState<Record<BlockId, Coord[]>>(() => {
     const init: Record<string, Coord[]> = {};
     for (const [id, block] of Object.entries(BLOCKS_8)) {
@@ -35,12 +39,12 @@ export const BlockTray: React.FC<BlockTrayProps> = ({
     <div className="w-full max-w-md lg:max-w-sm p-4 bg-[#14171d]/95 border-2 border-[#262b35] rounded-3xl shadow-xl flex flex-col gap-3">
       <div className="flex items-center justify-between border-b border-slate-700/60 pb-2">
         <div className="flex items-center gap-1.5">
-          <span className="text-xs font-bold text-slate-300 tracking-wider">BLOCK TRAY</span>
+          <span className="text-xs font-bold text-slate-300 tracking-wider">{t.trayTitle}</span>
           <span className="px-1.5 py-0.2 rounded bg-sky-950 border border-sky-800 text-[10px] text-sky-400 font-mono">
-            8 PIECES
+            {t.trayPiecesCount}
           </span>
         </div>
-        <span className="text-[11px] text-slate-400">点击旋转 / 拖拽上盘</span>
+        <span className="text-[11px] text-slate-400">{t.trayActionHint}</span>
       </div>
 
       {/* 8 块积木自适应网格，iPad / 桌面上一屏尽览无需滚动 */}
@@ -70,7 +74,7 @@ export const BlockTray: React.FC<BlockTrayProps> = ({
                 }}
               />
               <span className="text-[10px] text-slate-400 mt-1 font-sans">
-                {block.name}
+                {t.blocks[block.id]}
               </span>
             </div>
           );

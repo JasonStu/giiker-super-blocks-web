@@ -1,6 +1,6 @@
-# 计客超级积木 Web / iPad 电子复刻版 (GiiKER Super Blocks Web)
+# 超级积木 Web / iPad 电子版 (SUPER BLOCKS - Smart Spatial Puzzle)
 
-> 🎮 完美复刻经典益智掌机「计客超级积木」，专为 iPad 触控与现代 Web 打造，包含 100 个 100% 可解关卡、5 阶动态难度机身主题与全套拟真交互音效。
+> 🎮 经典益智空间积木掌机，专为 iPad 触控与现代 Web 打造，包含 100 个 100% 可解关卡、中英双语国际化支持、5 阶动态难度机身主题与全套拟真交互音效。
 
 [![React](https://img.shields.io/badge/React-18-blue.svg)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg)](https://www.typescriptlang.org/)
@@ -79,12 +79,14 @@ src/
 │   ├── bitboard.ts          # 64 位 BigInt 位运算棋盘状态管理器
 │   ├── levels.ts            # 100 个 100% 可解关卡数据
 │   └── solver.ts            # DLX / 回溯求解算法
+├── i18n/                    # 国际化语言包系统（支持中英双语、海外自动侦测）
+│   └── locales.ts           # 5 阶难度、积木名称、提示与关卡名双语映射
 ├── audio/                   # Web Audio 声音合成系统
 │   └── soundEngine.ts       # 咔嗒点击、入槽、报错哔声、五阶通关旋律
 ├── fx/                      # 特效系统
 │   └── fireworks.ts         # Canvas 粒子烟花引擎（按难度发射不同形态）
 ├── components/              # 视觉组件层
-│   ├── ConsoleShell.tsx     # 拟真掌机机壳（动态 5 阶难度主题）
+│   ├── ConsoleShell.tsx     # 拟真掌机机壳（动态 5 阶难度主题、语言切换）
 │   ├── LedBoard.tsx         # 8×8 点阵 LED 矩阵显示屏
 │   ├── BlockPiece.tsx       # 独立积木渲染器（半透明质感，支持旋转预览）
 │   ├── BlockTray.tsx        # 8 块精简积木收纳舱

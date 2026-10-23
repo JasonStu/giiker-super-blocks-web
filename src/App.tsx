@@ -6,6 +6,7 @@ import { coordsToBitmask, validatePlacement, checkVictory } from './engine/bitbo
 import { findSolution } from './engine/solver';
 import { soundEngine } from './audio/soundEngine';
 import { fireworksEngine } from './fx/fireworks';
+import { Language, getDefaultLanguage, translations } from './i18n/locales';
 import { ConsoleShell } from './components/ConsoleShell';
 import { LedBoard } from './components/LedBoard';
 import { BlockTray } from './components/BlockTray';
@@ -23,6 +24,9 @@ interface DragState {
 }
 
 export const App: React.FC = () => {
+  const [lang, setLang] = useState<Language>(getDefaultLanguage());
+  const t = translations[lang];
+
   const [levelIndex, setLevelIndex] = useState(0);
   const currentLevel = BUILTIN_LEVELS[levelIndex];
 
@@ -38,6 +42,10 @@ export const App: React.FC = () => {
   // 拖拽手势状态
   const [dragState, setDragState] = useState<DragState | null>(null);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const handleToggleLanguage = () => {
+    setLang((prev) => (prev === 'en' ? 'zh' : 'en'));
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -87,7 +95,7 @@ export const App: React.FC = () => {
     const targetIdx = targetStartLevelMap[difficulty];
     setLevelIndex(targetIdx);
     resetLevel();
-    showToast(`已切换至【${currentLevel.name.split(' ')[0]}】第 ${targetIdx + 1} 关`);
+    showToast(t.toasts.levelSwitched(t.difficulties[difficulty], targetIdx + 1));
   };
 
   // 提示模式 (Learn/Hint)
@@ -95,7 +103,7 @@ export const App: React.FC = () => {
     soundEngine.playClick();
     const solution = findSolution(currentLevel.targetMask, currentLevel.allowedColors);
     if (!solution || solution.length === 0) {
-      showToast("此关卡解法探索中或无可提示积木");
+      showToast(t.toasts.noHintAvailable);
       return;
     }
 
@@ -103,10 +111,10 @@ export const App: React.FC = () => {
     const nextPiece = solution.find((b) => !placedSet.has(b.id));
     if (nextPiece) {
       setHintCells(nextPiece.cells);
-      showToast(`提示：请尝试摆放【${BLOCKS_8[nextPiece.id].name}】`);
+      showToast(t.toasts.hintToast(t.blocks[nextPiece.id]));
       setTimeout(() => setHintCells([]), 4000);
     } else {
-      showToast("所有必要积木已全部放置！");
+      showToast(t.toasts.allBlocksPlaced);
     }
   };
 
@@ -121,7 +129,7 @@ export const App: React.FC = () => {
     soundEngine.playClick();
     const removed = placedBlocks[clickedBlockIndex];
     setPlacedBlocks((prev) => prev.filter((_, idx) => idx !== clickedBlockIndex));
-    showToast(`已取下 ${BLOCKS_8[removed.id].name}`);
+    showToast(t.toasts.removedBlock(t.blocks[removed.id]));
   };
 
   // 处理盘面积木单击：尝试顺时针旋转，无法旋转时报错保留，严禁擅自删除
@@ -160,7 +168,7 @@ export const App: React.FC = () => {
       soundEngine.playError();
       setErrorCoords(targetBlock.cells);
       setTimeout(() => setErrorCoords([]), 400);
-      showToast("空间受限无法旋转（双击可取下）");
+      showToast(t.toasts.cannotRotate);
     }
   };
 
@@ -299,13 +307,13 @@ export const App: React.FC = () => {
           setErrorCoords(absoluteCells);
           setTimeout(() => setErrorCoords([]), 500);
           if (validation.reason === 'outside_target') {
-            showToast("超出指定发光区域");
+            showToast(t.toasts.outsideTarget);
           } else if (validation.reason === 'overlap') {
-            showToast("与其他积木重叠");
+            showToast(t.toasts.overlap);
           } else if (validation.reason === 'color_disallowed') {
-            showToast("本关不允许使用该颜色");
+            showToast(t.toasts.colorDisallowed);
           } else {
-            showToast("超出棋盘边界");
+            showToast(t.toasts.outOfBounds);
           }
         }
       }
@@ -317,7 +325,7 @@ export const App: React.FC = () => {
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
     };
-  }, [dragState, placedBlocks, currentLevel, levelIndex]);
+  }, [dragState, placedBlocks, currentLevel, levelIndex, t]);
 
   const placedBlockIds = new Set(placedBlocks.map((b) => b.id));
 
@@ -337,11 +345,13 @@ export const App: React.FC = () => {
         {/* 掌机机身核心区 */}
         <ConsoleShell
           level={currentLevel}
+          lang={lang}
           onPrev={handlePrevLevel}
           onNext={handleNextLevel}
           onReset={resetLevel}
           onHint={handleHint}
           onSelectDifficulty={handleSelectDifficulty}
+          onToggleLanguage={handleToggleLanguage}
           isMuted={isMuted}
           onToggleSound={() => {
             const nextMuted = !isMuted;
@@ -367,13 +377,13 @@ export const App: React.FC = () => {
             {isWon && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/65 backdrop-blur-sm rounded-2xl animate-fade-in z-20 gap-3">
                 <span className="text-xl font-extrabold text-amber-300 drop-shadow-md">
-                  CHALLENGE CLEARED!
+                  {t.challengeCleared}
                 </span>
                 <button
                   onClick={handleNextLevel}
                   className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 active:scale-95 text-white font-bold rounded-2xl shadow-[0_0_20px_rgba(56,189,248,0.6)] transition-all cursor-pointer"
                 >
-                  <span>下一关</span>
+                  <span>{t.nextLevelBtn}</span>
                   <ArrowRight size={18} />
                 </button>
               </div>
@@ -386,10 +396,11 @@ export const App: React.FC = () => {
           <BlockTray
             allowedColors={currentLevel.allowedColors}
             placedBlockIds={placedBlockIds}
+            lang={lang}
             onStartDrag={handleStartDrag}
           />
           <div className="text-[11px] text-slate-500 text-center font-mono">
-            提示：盘面积木点击旋转，双击可取下放回托盘
+            {t.boardBottomHint}
           </div>
         </div>
       </div>
